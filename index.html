@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Slot Machine</title>
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #222;
+  color: white;
+}
+
+.slot {
+  display: inline-block;
+  font-size: 60px;
+  background: white;
+  color: black;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+button {
+  font-size: 25px;
+  padding: 10px 30px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎰 Slot Machine</h1>
+
+<div id="slots">
+  <span class="slot">🍒</span>
+  <span class="slot">🍋</span>
+  <span class="slot">⭐</span>
+</div>
+
+<br>
+
+<button onclick="spin()">SPIN</button>
+
+<h2 id="result"></h2>
+
+<script>
+const symbols = ["🍒","🍋","⭐","7️⃣","🍀","💎"];
+
+function spin(){
+  let slots = document.querySelectorAll(".slot");
+  let result = [];
+
+  slots.forEach(slot=>{
+    let symbol = symbols[Math.floor(Math.random()*symbols.length)];
+    slot.innerHTML = symbol;
+    result.push(symbol);
+  });
+
+  if(result[0] === result[1] && result[1] === result[2]){
+    document.getElementById("result").innerHTML="🎉 JACKPOT!";
+  } else {
+    document.getElementById("result").innerHTML="Try again!";
+  }
+}
+</script>
+
+</body>
+</html>
