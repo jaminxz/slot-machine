@@ -1,68 +1,287 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Slot Machine</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D Casino Slot</title>
+
 <style>
-body {
-  font-family: Arial;
-  text-align: center;
-  background: #222;
-  color: white;
+body{
+margin:0;
+background:radial-gradient(circle,#555,#000);
+font-family:Arial;
+text-align:center;
+color:white;
 }
 
-.slot {
-  display: inline-block;
-  font-size: 60px;
-  background: white;
-  color: black;
-  padding: 20px;
-  margin: 10px;
-  border-radius: 10px;
+h1{
+color:#ffd700;
+text-shadow:0 0 20px orange;
 }
 
-button {
-  font-size: 25px;
-  padding: 10px 30px;
-  cursor: pointer;
+.machine{
+width:360px;
+margin:auto;
+background:linear-gradient(145deg,#e00000,#500000);
+padding:25px;
+border-radius:35px;
+border:10px solid gold;
+box-shadow:
+inset 0 0 30px #000,
+0 0 40px black;
+animation:lights 1s infinite alternate;
 }
+
+@keyframes lights{
+from{box-shadow:0 0 20px red;}
+to{box-shadow:0 0 50px yellow;}
+}
+
+.display{
+background:#111;
+padding:20px;
+border-radius:20px;
+box-shadow:inset 0 0 20px black;
+}
+
+.reels{
+display:flex;
+justify-content:center;
+gap:12px;
+}
+
+.reel{
+width:85px;
+height:95px;
+background:white;
+color:black;
+font-size:60px;
+border-radius:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:
+inset 0 0 10px gray,
+0 5px 10px black;
+}
+
+.spin{
+margin-top:25px;
+width:120px;
+height:120px;
+border-radius:50%;
+background:#ffd700;
+font-size:25px;
+font-weight:bold;
+cursor:pointer;
+border:8px solid orange;
+}
+
+.spin:active{
+transform:scale(.9);
+}
+
+.info{
+font-size:22px;
+margin-top:20px;
+}
+
+.win{
+color:#00ff00;
+font-size:30px;
+animation:flash .4s infinite;
+}
+
+@keyframes flash{
+50%{opacity:.3}
+}
+
+.shake{
+animation:shake .1s infinite;
+}
+
+@keyframes shake{
+25%{transform:translateY(-8px)}
+50%{transform:translateY(8px)}
+}
+
 </style>
 </head>
 
+
 <body>
 
-<h1>🎰 Slot Machine</h1>
+<h1>🎰 ROYAL 3D SLOT 🎰</h1>
 
-<div id="slots">
-  <span class="slot">🍒</span>
-  <span class="slot">🍋</span>
-  <span class="slot">⭐</span>
+
+<div class="machine">
+
+<div class="display">
+
+<div class="reels">
+
+<div class="reel" id="a">💎</div>
+<div class="reel" id="b">⭐</div>
+<div class="reel" id="c">7️⃣</div>
+
 </div>
 
+</div>
+
+
+<button class="spin" onclick="pullLever()">
+🎰
 <br>
+SPIN
+</button>
 
-<button onclick="spin()">SPIN</button>
 
-<h2 id="result"></h2>
+<div class="info">
+💰 Coins: <span id="coin">500</span>
+<br>
+🏆 Level: <span id="level">1</span>
+</div>
+
+
+<h2 id="msg">
+Pull the lever!
+</h2>
+
+
+</div>
+
 
 <script>
-const symbols = ["🍒","🍋","⭐","7️⃣","🍀","💎"];
 
-function spin(){
-  let slots = document.querySelectorAll(".slot");
-  let result = [];
+const symbols=[
+"🍒",
+"🍋",
+"⭐",
+"💎",
+"7️⃣",
+"🍀"
+];
 
-  slots.forEach(slot=>{
-    let symbol = symbols[Math.floor(Math.random()*symbols.length)];
-    slot.innerHTML = symbol;
-    result.push(symbol);
-  });
+let coins=500;
+let level=1;
+let wins=0;
 
-  if(result[0] === result[1] && result[1] === result[2]){
-    document.getElementById("result").innerHTML="🎉 JACKPOT!";
-  } else {
-    document.getElementById("result").innerHTML="Try again!";
-  }
+
+function sound(freq,time){
+
+let ctx=new AudioContext();
+let osc=ctx.createOscillator();
+
+osc.frequency.value=freq;
+osc.connect(ctx.destination);
+osc.start();
+
+setTimeout(()=>{
+osc.stop();
+},time);
+
 }
+
+
+
+function pullLever(){
+
+if(coins<20){
+msg.innerHTML="เหรียญหมด!";
+return;
+}
+
+coins-=20;
+
+coin.innerHTML=coins;
+
+
+let reels=[
+a,b,c
+];
+
+
+reels.forEach(x=>{
+x.classList.add("shake");
+});
+
+
+let spinSound=setInterval(()=>{
+sound(200,50);
+
+reels.forEach(x=>{
+x.innerHTML=
+symbols[Math.floor(Math.random()*symbols.length)];
+});
+
+},100);
+
+
+
+setTimeout(()=>{
+
+clearInterval(spinSound);
+
+
+reels.forEach(x=>{
+x.classList.remove("shake");
+});
+
+
+let result=[
+a.innerHTML,
+b.innerHTML,
+c.innerHTML
+];
+
+
+if(
+result[0]==result[1] &&
+result[1]==result[2]
+){
+
+let reward=200+(level*100);
+
+coins+=reward;
+wins++;
+
+
+sound(800,500);
+
+
+msg.innerHTML=
+"🎉 JACKPOT +"+reward+" COINS";
+
+msg.className="win";
+
+
+if(wins%3==0){
+level++;
+msg.innerHTML+="<br>⭐ LEVEL UP!";
+}
+
+
+}else{
+
+sound(300,200);
+
+msg.innerHTML=
+"ลองอีกครั้ง 😄";
+
+msg.className="";
+
+}
+
+
+coin.innerHTML=coins;
+level.innerHTML=level;
+
+
+},1500);
+
+
+}
+
+
 </script>
 
 </body>
